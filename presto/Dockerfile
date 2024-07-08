@@ -1,9 +1,7 @@
 FROM openjdk:8
 
-# Set Presto version
 ENV PRESTO_VERSION 350
 
-# Install Presto and Python
 RUN apt-get update && \
     apt-get install -y wget python && \
     apt-get clean && \
@@ -15,13 +13,15 @@ RUN apt-get update && \
 ENV PRESTO_HOME=/usr/local/presto
 ENV PATH=$PATH:$PRESTO_HOME/bin
 
-# Additional configuration and setup
+RUN mkdir -p $PRESTO_HOME/etc
+
 COPY config.properties $PRESTO_HOME/etc/
 COPY jvm.config $PRESTO_HOME/etc/
 COPY node.properties $PRESTO_HOME/etc/
 
-# Expose necessary ports
-EXPOSE 8080
+EXPOSE 8081
 
-# Start Presto server
-CMD ["/usr/local/presto/bin/launcher", "start"]
+RUN echo "Printing Presto configuration files:"
+RUN ls -l $PRESTO_HOME/etc/
+
+CMD ["bash", "-c", "/usr/local/presto/bin/launcher run; tail -f /dev/null"]

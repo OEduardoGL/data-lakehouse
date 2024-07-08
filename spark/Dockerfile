@@ -2,12 +2,10 @@ FROM openjdk:8
 
 RUN mkdir -p /run/sshd
 
-# Install wget and ssh
 RUN apt-get update && \
     apt-get install -y wget ssh && \
     apt-get clean
 
-# Install Spark
 ENV SPARK_VERSION=3.4.3
 RUN wget https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz && \
     tar -xzf spark-${SPARK_VERSION}-bin-hadoop3.tgz && \
@@ -17,7 +15,6 @@ RUN wget https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VER
 ENV SPARK_HOME=/usr/local/spark
 ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
 
-# Setup SSH
 RUN ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa && \
     cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 

@@ -38,6 +38,10 @@ services:
       - hadoop-hdfs
       - hive
       - spark
+    volumes:
+      - ./presto/config.properties:/usr/local/presto/etc/config.properties
+      - ./presto/jvm.config:/usr/local/presto/etc/jvm.config
+      - ./presto/node.properties:/usr/local/presto/etc/node.properties
 
 volumes:
   hadoop-namenode:
