@@ -1,0 +1,49 @@
+<configuration>
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:mysql://mysql:3306/metastore_db?createDatabaseIfNotExist=true</value>
+        <description>JDBC connect string for a JDBC metastore</description>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>com.mysql.jdbc.Driver</value>
+        <description>Driver class name for a JDBC metastore</description>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>hive</value>
+        <description>Username to use against metastore database</description>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>hivepassword</value>
+        <description>Password to use against metastore database</description>
+    </property>
+
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/user/hive/warehouse</value>
+        <description>location of default database for the warehouse</description>
+    </property>
+    
+    <property>
+        <name>datanucleus.autoCreateSchema</name>
+        <value>true</value>
+        <description>Auto create the schema</description>
+    </property>
+
+    <property>
+        <name>datanucleus.fixedDatastore</name>
+        <value>false</value>
+        <description>Whether the schema is fixed</description>
+    </property>
+
+    <property>
+        <name>datanucleus.autoCreateTables</name>
+        <value>true</value>
+        <description>Auto create the tables</description>
+    </property>
+</configuration>

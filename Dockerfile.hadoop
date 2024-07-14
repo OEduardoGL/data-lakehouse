@@ -1,0 +1,42 @@
+# Use a imagem do Ubuntu como base
+FROM ubuntu:20.04
+
+# Instalar dependências
+RUN apt-get update && apt-get install -y \
+    openjdk-8-jdk \
+    ssh \
+    rsync \
+    vim \
+    wget \
+    curl \
+    net-tools \
+    iputils-ping
+
+# Configurar SSH
+RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
+    chmod 600 ~/.ssh/authorized_keys
+
+# Configurar variáveis de ambiente para o Hadoop
+ENV HADOOP_VERSION 3.3.6
+ENV HADOOP_HOME /usr/local/hadoop
+ENV HADOOP_CONF_DIR $HADOOP_HOME/etc/hadoop
+ENV PATH $PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+
+# Baixar e instalar o Hadoop
+RUN wget https://downloads.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
+    tar -xzvf hadoop-$HADOOP_VERSION.tar.gz && \
+    mv hadoop-$HADOOP_VERSION $HADOOP_HOME && \
+    rm hadoop-$HADOOP_VERSION.tar.gz
+
+# Copiar arquivos de configuração
+COPY conf/core-site.xml $HADOOP_CONF_DIR/
+COPY conf/hdfs-site.xml $HADOOP_CONF_DIR/
+COPY conf/mapred-site.xml $HADOOP_CONF_DIR/
+COPY conf/yarn-site.xml $HADOOP_CONF_DIR/
+
+# Adicionar um script de entrada
+COPY scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

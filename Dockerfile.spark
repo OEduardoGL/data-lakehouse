@@ -1,0 +1,26 @@
+# Use a imagem base do Hadoop
+FROM hadoop-base:latest
+
+# Instalar dependências
+RUN apt-get update && apt-get install -y \
+    wget \
+    netcat
+
+# Baixar e instalar o Spark
+ENV SPARK_VERSION 3.4.0
+ENV SPARK_HOME /opt/spark
+ENV PATH $PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+RUN wget https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/spark-$SPARK_VERSION-bin-hadoop3.tgz && \
+    tar -xzvf spark-$SPARK_VERSION-bin-hadoop3.tgz && \
+    mv spark-$SPARK_VERSION-bin-hadoop3 $SPARK_HOME && \
+    rm spark-$SPARK_VERSION-bin-hadoop3.tgz
+
+# Configurar Spark
+COPY conf/spark-defaults.conf $SPARK_HOME/conf/
+
+# Adicionar um script de entrada
+COPY scripts/spark-entrypoint.sh /spark-entrypoint.sh
+RUN chmod +x /spark-entrypoint.sh
+
+ENTRYPOINT ["/spark-entrypoint.sh"]

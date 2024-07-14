@@ -1,0 +1,26 @@
+# Use a imagem base do Hadoop
+FROM hadoop-base:latest
+
+# Instalar dependências
+RUN apt-get update && apt-get install -y \
+    wget \
+    netcat
+
+# Baixar e instalar o Hive
+ENV HIVE_VERSION 3.1.2
+ENV HIVE_HOME /opt/hive
+ENV PATH $PATH:$HIVE_HOME/bin
+
+RUN wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
+    tar -xzvf apache-hive-$HIVE_VERSION-bin.tar.gz && \
+    mv apache-hive-$HIVE_VERSION-bin $HIVE_HOME && \
+    rm apache-hive-$HIVE_VERSION-bin.tar.gz
+
+# Configurar Hive
+COPY conf/hive-site.xml $HIVE_HOME/conf/
+
+# Adicionar um script de entrada
+COPY scripts/hive-entrypoint.sh /hive-entrypoint.sh
+RUN chmod +x /hive-entrypoint.sh
+
+ENTRYPOINT ["/hive-entrypoint.sh"]

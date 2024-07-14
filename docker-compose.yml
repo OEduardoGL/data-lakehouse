@@ -1,48 +1,54 @@
-version: '3'
-
+version: '3.8'
 services:
-  hadoop-hdfs:
-    build: ./hadoop-hdfs
-    container_name: hadoop-hdfs
-    ports:
-      - "50070:50070"
-      - "8020:8020"
+  namenode:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: namenode
     volumes:
-      - hadoop-namenode:/usr/local/hadoop/hdfs/namenode
-      - hadoop-datanode:/usr/local/hadoop/hdfs/datanode
-
-  spark:
-    build: ./spark
-    container_name: spark
+      - hadoop_namenode:/hadoop/dfs/name
     ports:
-      - "8080:8080"
-    depends_on:
-      - hadoop-hdfs
+      - "9870:9870"
+      - "9000:9000"
+
+  datanode:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: datanode
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    ports:
+      - "9864:9864"
 
   hive:
-    build: ./hive
+    build:
+      context: .
+      dockerfile: Dockerfile.hive
     container_name: hive
-    ports:
-      - "10000:10000"
     depends_on:
-      - hadoop-hdfs
-    environment:
-      HADOOP_HOME: /usr/local/hadoop
+      - namenode
+      - datanode
 
-  presto:
-    build: ./presto
-    container_name: presto
-    ports:
-      - "8081:8081"
+  spark-master:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    container_name: spark-master
     depends_on:
-      - hadoop-hdfs
-      - hive
-      - spark
-    volumes:
-      - ./presto/config.properties:/usr/local/presto/etc/config.properties
-      - ./presto/jvm.config:/usr/local/presto/etc/jvm.config
-      - ./presto/node.properties:/usr/local/presto/etc/node.properties
+      - namenode
+      - datanode
+    ports:
+      - "8080:8080"
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    container_name: spark-worker
+    depends_on:
+      - spark-master
 
 volumes:
-  hadoop-namenode:
-  hadoop-datanode:
+  hadoop_namenode:
+  hadoop_datanode:
